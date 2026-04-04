@@ -1,0 +1,160 @@
+import { TurboFMBus } from './TurboFMBus';
+import { TurboFMSynth } from './TurboFMSynth';
+import { defaultSynth, defaultFx, defaultSteps, FxKnobId, SynthParamId, TurboFMStep, STEP_COUNT } from './types';
+
+export type DeckId = 'A' | 'B';
+
+export class TurboFMEngine {
+  readonly deckId: DeckId;
+  private ctx!: AudioContext;
+  
+  private bus!: TurboFMBus;
+  private synth!: TurboFMSynth;
+
+  private _playing = false;
+  private _currentStep = -1;
+  private _bpm = 120;
+  private _syncToMaster = false;
+  private _swing = 0.0;
+  private _masterVolume = 1.0;
+
+  private _steps: TurboFMStep[] = defaultSteps();
+  private _synthParams = defaultSynth();
+  private _fxParams = defaultFx();
+
+  onStepChange?: (step: number) => void;
+
+  private timerId: number | null = null;
+  private nextStepTime = 0;
+
+  constructor(deckId: DeckId) {
+    this.deckId = deckId;
+  }
+
+  init(ctx: AudioContext) {
+    this.ctx = ctx;
+    this.bus = new TurboFMBus(this.ctx);
+    this.synth = new TurboFMSynth(this.ctx);
+    
+    this.synth.connect(this.bus.input);
+
+    this.applyAllSynthParams();
+    this.synth.setPattern(this._steps);
+    this.synth.setTempo(this._bpm);
+  }
+
+  destroy() {
+    this.stop();
+    this.synth.destroy();
+    this.bus.destroy();
+  }
+
+  engage() {
+    if (this._playing) return;
+    this._playing = true;
+    this.nextStepTime = this.ctx.currentTime;
+    
+    this.synth.setRunning(true);
+    
+    const TICK_MS = 25;
+    this.timerId = window.setInterval(this.tick, TICK_MS);
+  }
+
+  stop() {
+    this._playing = false;
+    this._currentStep = -1;
+    this.synth.setRunning(false);
+    if (this.timerId !== null) {
+      clearInterval(this.timerId);
+      this.timerId = null;
+    }
+    if (this.onStepChange) this.onStepChange(-1);
+  }
+
+  private tick = () => {
+    const bpm = this._bpm;
+    this.synth.setTempo(bpm);
+    
+    const stepDuration = (60 / bpm) / 4; 
+    const LOOK_AHEAD_S = 0.05;
+    
+    while (this.nextStepTime < this.ctx.currentTime + LOOK_AHEAD_S) {
+      this._currentStep = (this._currentStep + 1) % STEP_COUNT;
+      if (this.onStepChange) {
+        const delay = Math.max(0, this.nextStepTime - this.ctx.currentTime) * 1000;
+        const stepToNotify = this._currentStep;
+        setTimeout(() => this.onStepChange!(stepToNotify), delay);
+      }
+      this.nextStepTime += stepDuration;
+    }
+  };
+
+  get isPlaying() { return this._playing; }
+  get currentStep() { return this._currentStep; }
+  get bpm() { return this._bpm; }
+  get syncToMaster() { return this._syncToMaster; }
+  set syncToMaster(v: boolean) { this._syncToMaster = v; }
+  get swing() { return this._swing; }
+  set swing(v: number) { this._swing = v; }
+  
+  get masterVolume() { return this._masterVolume; }
+  set masterVolume(v: number) {
+    this._masterVolume = v;
+    this.bus.setVolume(v);
+  }
+
+  get steps() { return this._steps; }
+  
+  updateStep(idx: number, stepData: Partial<TurboFMStep>) {
+    this._steps[idx] = { ...this._steps[idx], ...stepData };
+    this.synth.setPattern(this._steps);
+  }
+
+  clearPattern() {
+    this._steps = this._steps.map(s => ({ ...s, gate: false }));
+    this.synth.setPattern(this._steps);
+  }
+
+  resetPattern() {
+    this._steps = defaultSteps();
+    this.synth.setPattern(this._steps);
+  }
+
+  get synthParams() { return this._synthParams; }
+  setSynthParam(id: SynthParamId, value: number) {
+    this._synthParams[id] = value;
+    this.applySynthParam(id, value);
+  }
+
+  get fxParams() { return this._fxParams; }
+  setFx(id: FxKnobId, value: number) {
+    this._fxParams[id] = value;
+  }
+
+  private applySynthParam(id: SynthParamId, norm: number) {
+    switch (id) {
+      case 'algo': this.synth.setAlgo(Math.round(norm * 3.0)); break;
+      case 'feedback': this.synth.setFeedback(norm); break;
+      case 'carAttack': this.synth.setCarAttack(0.001 + norm * 2.0); break;
+      case 'carDecay': this.synth.setCarDecay(0.001 + norm * 5.0); break;
+      case 'modAttack': this.synth.setModAttack(0.001 + norm * 2.0); break;
+      case 'modDecay': this.synth.setModDecay(0.001 + norm * 5.0); break;
+      
+      // Ratios map to interesting FM ratios (0.5, 1, 2, 3, 4, 5, 7, 11 etc but simpler: smooth 0.5 to 10.0)
+      case 'op1Ratio': this.synth.setOpRatio(0, 0.5 + norm * 9.5); break;
+      case 'op1Level': this.synth.setOpLevel(0, norm); break;
+      case 'op2Ratio': this.synth.setOpRatio(1, 0.5 + norm * 9.5); break;
+      case 'op2Level': this.synth.setOpLevel(1, norm); break;
+      case 'op3Ratio': this.synth.setOpRatio(2, 0.5 + norm * 9.5); break;
+      case 'op3Level': this.synth.setOpLevel(2, norm); break;
+      case 'op4Ratio': this.synth.setOpRatio(3, 0.5 + norm * 9.5); break;
+      case 'op4Level': this.synth.setOpLevel(3, norm); break;
+    }
+  }
+
+  private applyAllSynthParams() {
+    for (const k of Object.keys(this._synthParams)) {
+      this.applySynthParam(k as SynthParamId, this._synthParams[k as SynthParamId]);
+    }
+  }
+}
