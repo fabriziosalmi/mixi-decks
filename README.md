@@ -54,3 +54,18 @@ window.addEventListener('TurboCamMotion', (e) => {
   // Map x and y (0.0 to 1.0) to your global Cutoff and Resonance!
 });
 ```
+
+### TurboBrain
+Binaural beats generator for psychoacoustic brainwave entrainment. Pans pure tuning frequencies to left and right channels to trigger auditory illusions (Delta, Theta, Alpha, Beta, Gamma). Requires stereo headphones.
+
+### TurboGeiger
+Hardware-free Geiger-Müller counter simulation. Models radioactive isotope decay mathematically using Poisson processes, emitting un-quantized, stochastic bursts of percussive energy. Perfect for creating highly irregular noise structures.
+
+### TurboWeather
+Real-time API meteorological audiolizer. Feeds live temperature, wind speed, and precipitation data into the WebAudio graph. Generates windstorms from noise buffers and rain synthesis based on global terrestrial coordinates.
+
+### TurboBoid
+Flocking algorithm (Artificial Life) sequencer. Calculates multi-agent cohesive constraints on an X/Y field. When agents collide with boundaries, they trigger generative geometric tones, creating organic, non-linear arpeggios.
+
+### TurboSonar
+Deep-water sonar mapping. Impulses high-frequency oscillator pings into an abyssal 5-second synthetic ConvolverNode decay network, simulating immense subterranean depth spaces and dark ambient atmospheres.
