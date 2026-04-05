@@ -14,6 +14,16 @@ export default defineConfig({
         text: 'Introduction',
         items: [
           { text: 'Getting Started', link: '/guide/getting-started' },
+          { text: 'Architecture & Engine', link: '/guide/architecture' }
+        ]
+      },
+      {
+        text: 'The Collections',
+        items: [
+          { text: 'I. Core Synthesis', link: '/decks/core' },
+          { text: 'II. Generative Ambient', link: '/decks/generative' },
+          { text: 'III. The Absurd Series', link: '/decks/absurd' },
+          { text: 'IV. Avant-Garde Domain', link: '/decks/avant-garde' }
         ]
       }
     ],
