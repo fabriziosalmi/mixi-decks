@@ -69,3 +69,18 @@ Flocking algorithm (Artificial Life) sequencer. Calculates multi-agent cohesive 
 
 ### TurboSonar
 Deep-water sonar mapping. Impulses high-frequency oscillator pings into an abyssal 5-second synthetic ConvolverNode decay network, simulating immense subterranean depth spaces and dark ambient atmospheres.
+
+### TurboPulsar
+Astrophysical metronome. Emulates the precise rotational period of neutron stars (Pulsars) by emitting compressed white-noise radiation bursts. Includes an interstellar Dispersion Measure filter.
+
+### TurboGenome
+Biological sequence arpeggiator. Crawls through literal DNA nucleotide strings (Adenine, Cytosine, Guanine, Thymine) via a Markov chain, converting genetic bounds into mathematically scaled acidic synth arpeggios. Features real-time artificial mutation rates.
+
+### TurboTicker
+Psychoacoustic financial arbitrage. Connects to live Crypto APIs (BTC/USD) mapping the current price to an infinite Shepard Tone glissando. As the market Inflates, tension rises eternally. As it crashes, it descends into the abyss.
+
+### TurboMorse
+Cryptography war transmitter. Encodes arbitrary text into military-grade Telegraph signals (Dots and Dashes) played through an overcranked, hard-clipping WaveShaper node. Ideal for injecting raw, distorted subliminal codes into the mix.
+
+### TurboFractal
+Non-linear mathematical drone. Navigates the complex plane of the Mandelbrot set (Z² + C). Maps the fractal's escape velocity directly onto a custom `PeriodicWave` partial-harmonic spectrum, reshaping the overtone series of a drone oscillator in real-time based on fractal geometry.
