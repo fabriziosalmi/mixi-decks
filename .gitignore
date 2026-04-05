@@ -1,0 +1,22 @@
+# Node / React
+node_modules/
+dist/
+dist-ssr/
+*.local
+
+# Rust / WASM
+target/
+Cargo.lock
+
+# System
+.DS_Store
+Thumbs.db
+node_modules
+.env
+
+# Mixi Legacy / Temporary
+/tmp/
+*.log
+.sass-cache/
+site/
+webrat.log
