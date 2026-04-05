@@ -42,3 +42,15 @@ Bypasses WASM to run directly on the WebAudio API `ScriptProcessor`, combining P
 ### TurboRadio
 Icecast/Shoutcast stream capturer.
 Designed to mount external streams securely via CORS-bypassing `<audio>` elements directly into the Mixi processing chain via `MediaElementAudioSourceNode` for live scratching and mixing.
+
+### TurboCam
+Optical Flow Theremin sensor (Computer Vision without external dependencies).
+Utilizes a native `requestAnimationFrame` loop mapping webcam RGB pixel differences across an offscreen canvas to track hand movement geometry. 
+Exposes movement data via standard window events for frictionless injection into MIXI's master audio bus:
+```javascript
+// Listen to hand movement geometry from MIXI host:
+window.addEventListener('TurboCamMotion', (e) => {
+  const { deckId, x, y } = e.detail;
+  // Map x and y (0.0 to 1.0) to your global Cutoff and Resonance!
+});
+```
