@@ -1,4 +1,4 @@
-# Mixi Decks: The Absurd Collection
+# Mixi Decks: The Collection
 
 ![License](https://img.shields.io/badge/license-MIT-blue)
 ![Architecture](https://img.shields.io/badge/architecture-Rust/WASM+WebAudio-orange)
