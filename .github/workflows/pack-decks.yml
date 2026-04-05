@@ -1,0 +1,53 @@
+name: Pack and Upload Decks
+
+on:
+  release:
+    types: [created]
+  workflow_dispatch:
+    inputs:
+      target_tag:
+        description: 'Tag to upload to (e.g. v0.2.0)'
+        required: true
+
+permissions:
+  contents: write
+
+jobs:
+  package:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      
+      - name: Zip Individual Decks
+        run: |
+          mkdir -p output_zips
+          for d in Turbo*/ ; do
+             NAME=${d%/}
+             echo "Packaging $NAME..."
+             
+             # Check if there is an associated wasm directory (e.g. turbosynth-wasm)
+             LOWER_NAME=$(echo "$NAME" | tr '[:upper:]' '[:lower:]')
+             WASM_DIR="${LOWER_NAME}-wasm"
+             
+             if [ -d "$WASM_DIR" ]; then
+                echo "Found associated WASM crate: $WASM_DIR"
+                zip -r "output_zips/${NAME}.zip" "$NAME" "$WASM_DIR"
+             else
+                zip -r "output_zips/${NAME}.zip" "$NAME"
+             fi
+          done
+
+      - name: Upload Release Assets
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          if [ "${{ github.event_name }}" = "release" ]; then
+            TAG="${{ github.event.release.tag_name }}"
+          else
+            TAG="${{ github.event.inputs.target_tag }}"
+          fi
+          
+          echo "Uploading assets to release $TAG..."
+          for z in output_zips/*.zip; do
+            gh release upload "$TAG" "$z" --clobber
+          done
