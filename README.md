@@ -1,17 +1,46 @@
-# MIXI TurboDecks
+# Mixi TurboDecks
 
-A collection of ultra-low latency, Rust/WASM-powered synthesizer and FX deck plugins for [MIXI](https://github.com/fabriziosalmi/mixi), the ultimate web-based DJ & Groove platform.
+Mixi TurboDecks is a strictly typed library of high-performance drop-in plugins for the Mixi web-based DJ platform. These decks function as standalone modular instruments or atmospheric audio generators designed to integrate directly seamlessly within the Mixi master mixer and transport architecture.
 
-## Contents
+The core philosophy revolves around utilizing optimal processing layers based on the synthesis complexity: computational-heavy logic (e.g. frequency-modulation, phase-distortion, formant generation) runs on Rust-compiled WebAssembly, whereas procedural or atmospheric noise engines utilize the native WebAudio ScriptProcessor nodes.
 
-- **Turbo303**: A faithful Roland TB-303 analog clone ported to Rust, featuring highpass/allpass cascading filters, foldback distortion, and a built-in step sequencer with tied-notes and slides.
-- **TurboSynth**: A 32-step basic subtractive synthesizer (Sine/Tri/Saw/Square with AR envelope and Biquad filter).
+## Architecture & Integration
 
-## Integration
+Each TurboDeck is structured to expose a standardized `Engine`, `Bus`, and `Deck` component.
 
-Each directory (e.g., `Turbo303`) contains a fully self-contained React/WASM structure that implements the standard MIXI Deck Plugin architecture.
+- **DSP Core**: Located in `<plugin-wasm>` folders (Rust) or internally managed via native TypeScript buffers.
+- **Mixer Traversal**: Controlled via standard WebAudio API `GainNode` scaling, allowing the Mixi application to intercept, equalize, and crossfade each Deck without internal modifications.
+- **UI & State**: Encapsulated within `React` function components ensuring zero external state pollution. Sequenced engines read from global 32-step patterns.
 
-Simply move the deck folder into `src/decks/` inside the MIXI repository, and add one line to `DeckRegistry`.
+To integrate a new deck into the Mixi host application:
+1. Move the specific `<PluginName>/` TS directory and `<plugin-wasm>` folder into `src/decks/`.
+2. Assign the TS entry point within `src/decks/index.ts`.
+3. Include the matching `DeckId`.
 
----
-*Created for MIXI by Fabrizio Salmi & The Antigravity Team.*
+## Implemented Decks
+
+The following deck plugins are currently complete and production-ready:
+
+### Turbo303
+Hardware-style TB-303 emulator.
+Contains full DSP porting from internal JS logic to Rust/WASM, integrating fourier-based wavetable generation, diode-ladder filter equivalents, hardware-style step sequencer, and multi-mode distortion.
+
+### TurboSynth
+Subtractive poly/mono synthesizer.
+Engineered in WASM with a robust VCO (Saw, Pulse, Sine), Biquad Lowpass filter driven by discrete AR envelops, and a 32-step native sequencer.
+
+### TurboFM
+4-Operator FM synthesizer.
+Real-time frequency modulation implemented in WASM utilizing phase continuous calculations across 4 selectable modulation algorithms (Stack, Parallel, Multi-Carrier). Operates with distinct Attack-Release networks scaling phase indexes and ratio frequencies with a dedicated master feedback loop on OP1.
+
+### TurboVox
+Synthetic vocal/formant generator.
+WASM-powered vocal morphing algorithm operating across three parallel bandpass filters running extremely high Q-factors. Seamlessly interpolates center frequencies to morph between classical A, E, I, O, U formant presets alongside continuous glide and vibrato operators.
+
+### TurboFire
+Procedural ASMR ambient generator.
+Bypasses WASM to run directly on the WebAudio API `ScriptProcessor`, combining Paul Kellett's algorithm for Pink Noise (routed through dynamic lowpass filters for `Warmth`), stochastic high-amplitude sparse impulses for `Crackle`, and an LFO-modulated white noise for background `Wind` turbulence.
+
+### TurboRadio (In Progress)
+Icecast/Shoutcast stream capturer.
+Designed to mount external streams securely via CORS-bypassing `<audio>` elements directly into the Mixi processing chain via `MediaElementAudioSourceNode` for live scratching and mixing.
