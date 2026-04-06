@@ -25,6 +25,7 @@ export class TurboFMEngine {
   onStepChange?: (step: number) => void;
 
   private timerId: number | null = null;
+  private uiTimers: Set<number> = new Set();
   private nextStepTime = 0;
 
   constructor(deckId: DeckId) {
@@ -68,6 +69,8 @@ export class TurboFMEngine {
       clearInterval(this.timerId);
       this.timerId = null;
     }
+    this.uiTimers.forEach(t => window.clearTimeout(t));
+    this.uiTimers.clear();
     if (this.onStepChange) this.onStepChange(-1);
   }
 
@@ -83,7 +86,11 @@ export class TurboFMEngine {
       if (this.onStepChange) {
         const delay = Math.max(0, this.nextStepTime - this.ctx.currentTime) * 1000;
         const stepToNotify = this._currentStep;
-        setTimeout(() => this.onStepChange!(stepToNotify), delay);
+        const t = window.setTimeout(() => {
+           this.uiTimers.delete(t);
+           if (this.isPlaying && this.onStepChange) this.onStepChange(stepToNotify);
+        }, delay);
+        this.uiTimers.add(t);
       }
       this.nextStepTime += stepDuration;
     }

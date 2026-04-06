@@ -10,12 +10,12 @@ export interface HouseDeckProps {
 
 export interface KnobProps { value: number; label: string; onChange: (v: number) => void; size?: string; }
 const Knob: FC<KnobProps> = ({ value, label, onChange }) => (
-  <div className="flex flex-col items-center">
-    <span className="text-[10px] text-gray-400 font-mono truncate max-w-[60px]">{label}</span>
+  <div className="flex flex-col items-center gap-1 group">
+    <span className="text-[10px] text-gray-500 font-mono tracking-wider group-hover:text-gray-300 transition-colors uppercase truncate max-w-[60px]">{label}</span>
     <input 
       type="range" min="0" max="1" step="0.01" 
-      value={value} onChange={e => onChange(parseFloat(e.target.value))} 
-      className="w-12 h-1"
+      value={value} onChange={e => onChange(parseFloat(e.target.value))}
+      className="w-12 h-1 bg-gray-800 rounded-full appearance-none outline-none cursor-pointer accent-white hover:accent-gray-300 transition-all"
     />
   </div>
 );
@@ -37,14 +37,18 @@ export const TurboFMDeck: FC<HouseDeckProps> = ({ deckId, color, onSwitchToTrack
 
   useEffect(() => {
     const engine = new TurboFMEngine(deckId);
-    engine.init(new window.AudioContext());
+    const ctx = new window.AudioContext();
+    engine.init(ctx);
     engineRef.current = engine;
 
     engine.onStepChange = (step) => {
       setSnapshot(s => ({ ...s, currentStep: step }));
     };
 
-    return () => engine.destroy();
+    return () => {
+      engine.destroy();
+      ctx.close();
+    };
   }, [deckId]);
 
   if (!engineRef.current) return null;
