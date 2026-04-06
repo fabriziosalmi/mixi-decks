@@ -1,0 +1,11 @@
+{
+  "name": "mixi-decks-root",
+  "version": "0.3.0",
+  "private": true,
+  "description": "Root configuration for Mixi Decks developer experience",
+  "devDependencies": {
+    "typescript": "^5.0.0",
+    "@types/react": "^18.0.0",
+    "@types/react-dom": "^18.0.0"
+  }
+}
