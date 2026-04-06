@@ -36,11 +36,14 @@ export class JS303Engine {
     this.deckId = deckId;
   }
 
-  init(ctx: AudioContext) {
+  async init(ctx: AudioContext) {
     this.ctx = ctx;
     
     this.bus = new JS303Bus(this.ctx);
     this.synth = new JS303Synth(this.ctx);
+    
+    await this.synth.init();
+
     
     // Connect Synth output to Bus input
     this.synth.connect(this.bus.input);

@@ -34,25 +34,43 @@ export const JS303Deck: FC<HouseDeckProps> = ({ deckId, color, onSwitchToTrack }
   });
 
   const engineRef = useRef<JS303Engine | null>(null);
+  const [isReady, setIsReady] = useState(false);
 
   useEffect(() => {
     const engine = new JS303Engine(deckId);
     const ctx = new window.AudioContext();
-    engine.init(ctx);
     
-    engineRef.current = engine;
-
-    engine.onStepChange = (step) => {
-      setSnapshot(s => ({ ...s, currentStep: step }));
-    };
+    let isMounted = true;
+    engine.init(ctx).then(() => {
+      if (isMounted) {
+        engineRef.current = engine;
+        
+        engine.onStepChange = (step) => {
+          setSnapshot(s => ({ ...s, currentStep: step }));
+        };
+        
+        setIsReady(true);
+      }
+    });
 
     return () => {
+      isMounted = false;
       engine.destroy();
       ctx.close(); // Prevent severe AudioContext leaks (Max 6 per browser tab)
     };
   }, [deckId]);
 
-  if (!engineRef.current) return null;
+  if (!isReady || !engineRef.current) {
+    return (
+      <div className="flex flex-col h-full w-full bg-black/40 text-white rounded-lg p-4 font-mono items-center justify-center border border-gray-800">
+        <div className="animate-pulse flex flex-col items-center gap-4">
+          <div className="w-12 h-12 rounded-full border-t-2 border-b-2" style={{ borderColor: color, animation: 'spin 1s linear infinite' }} />
+          <span className="text-xs tracking-widest text-gray-500">BOOTING AUDIOWORKLET...</span>
+        </div>
+      </div>
+    );
+  }
+  
   const engine = engineRef.current;
 
   const handlePlayToggle = () => {
