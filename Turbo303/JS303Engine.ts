@@ -29,6 +29,7 @@ export class JS303Engine {
   onTrigger?: (step: number) => void;
 
   private timerId: number | null = null;
+  private uiTimers: Set<number> = new Set();
   private nextStepTime = 0;
 
   constructor(deckId: DeckId) {
@@ -79,6 +80,8 @@ export class JS303Engine {
       clearInterval(this.timerId);
       this.timerId = null;
     }
+    this.uiTimers.forEach(t => window.clearTimeout(t));
+    this.uiTimers.clear();
     if (this.onStepChange) this.onStepChange(-1);
   }
 
@@ -98,7 +101,11 @@ export class JS303Engine {
         // UI uses setTimeout so it triggers exactly when the audio starts
         const delay = Math.max(0, this.nextStepTime - this.ctx.currentTime) * 1000;
         const stepToNotify = this._currentStep;
-        setTimeout(() => this.onStepChange!(stepToNotify), delay);
+        const t = window.setTimeout(() => {
+          this.uiTimers.delete(t);
+          if (this.isPlaying && this.onStepChange) this.onStepChange(stepToNotify);
+        }, delay);
+        this.uiTimers.add(t);
       }
       
       // Swing logic for odd steps can be implemented by adding offset to nextStepTime

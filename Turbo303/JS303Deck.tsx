@@ -10,11 +10,12 @@ export interface HouseDeckProps {
 // Mock Knob for compilation completeness
 export interface KnobProps { value: number; label: string; onChange: (v: number) => void; size?: string; }
 const Knob: FC<KnobProps> = ({ value, label, onChange }) => (
-  <div className="flex flex-col items-center">
-    <span>{label}</span>
+  <div className="flex flex-col items-center gap-1 group">
+    <span className="text-[10px] text-gray-500 font-mono tracking-wider group-hover:text-gray-300 transition-colors uppercase">{label}</span>
     <input 
       type="range" min="0" max="1" step="0.01" 
-      value={value} onChange={e => onChange(parseFloat(e.target.value))} 
+      value={value} onChange={e => onChange(parseFloat(e.target.value))}
+      className="w-12 h-1 bg-gray-800 rounded-full appearance-none outline-none cursor-pointer accent-white hover:accent-gray-300 transition-all"
     />
   </div>
 );
@@ -45,7 +46,10 @@ export const JS303Deck: FC<HouseDeckProps> = ({ deckId, color, onSwitchToTrack }
       setSnapshot(s => ({ ...s, currentStep: step }));
     };
 
-    return () => engine.destroy();
+    return () => {
+      engine.destroy();
+      ctx.close(); // Prevent severe AudioContext leaks (Max 6 per browser tab)
+    };
   }, [deckId]);
 
   if (!engineRef.current) return null;
