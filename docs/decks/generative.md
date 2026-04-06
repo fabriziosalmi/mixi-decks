@@ -7,7 +7,7 @@ The Generative Ambient collection focuses on bypassing traditional oscillators a
 ## TurboFire
 Procedural ASMR ambient generator.
 
-Bypasses WASM to run directly on the WebAudio API `ScriptProcessor` using low-level bitwise operations.
+Bypasses WASM to run directly on a high-performance WebAudio API `AudioWorklet` thread using low-level bitwise operations.
 * **Implementation:** Combines Paul Kellett's algorithm for Pink Noise (routed through dynamic lowpass filters for `Warmth`), stochastic high-amplitude sparse impulses for `Crackle`, and an LFO-modulated white noise for background `Wind` turbulence.
 * **Use Case:** Ambient padding or background noise to fill the spectrum of a mix.
 

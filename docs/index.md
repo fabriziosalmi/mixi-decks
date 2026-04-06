@@ -20,6 +20,10 @@ features:
     details: Computer vision flow sensors, live RSS data hacking, and infinite procedural fire.
   - title: The Absurd Series
     details: Artificial life, psychoacoustics, meteorological weather arrays, and radioactive Poisson generation.
+  - title: Modular Intelligence (Phase 4)
+    details: Stochastic mutation engines utilizing Euclidean sequencing, Markov chains, and deterministic randomization for real-time generative playback.
+  - title: Translucent Rendering (Phase 5)
+    details: Hardware-accelerated glassmorphism interfaces designed to maintain strict WebAudio clock priority and prevent main-thread layout thrashing.
   - title: Avant-Garde Domain
     details: Pulsar neutron stars, genomic DNA arpeggiators, crypto tickers, and fractal equations.
 ---

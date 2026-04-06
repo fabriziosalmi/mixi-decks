@@ -32,11 +32,13 @@ export class TurboSynthEngine {
     this.deckId = deckId;
   }
 
-  init(ctx: AudioContext) {
+  async init(ctx: AudioContext) {
     this.ctx = ctx;
     
     this.bus = new TurboSynthBus(this.ctx);
     this.synth = new TurboSynthSynth(this.ctx);
+    
+    await this.synth.init();
     
     this.synth.connect(this.bus.input);
 
@@ -130,6 +132,71 @@ export class TurboSynthEngine {
   resetPattern() {
     this._steps = defaultSteps();
     this.synth.setPattern(this._steps);
+  }
+
+  mutateSequence() {
+    // Intelligent Techno/Arp Generator using Euclidean distributions
+    const hits = 5 + Math.floor(Math.random() * 12); // 5 to 16 hits
+    const offset = Math.floor(Math.random() * 8);
+    
+    // Euclidean algorithm
+    let pattern: boolean[] = Array(STEP_COUNT).fill(false);
+    let bucket = 0;
+    for (let i = 0; i < STEP_COUNT; i++) {
+        bucket += hits;
+        if (bucket >= STEP_COUNT) {
+            bucket -= STEP_COUNT;
+            pattern[i] = true;
+        }
+    }
+    
+    // Shift pattern
+    pattern = [...pattern.slice(offset), ...pattern.slice(0, offset)];
+
+    const scales = [
+      [0, 2, 4, 7, 9], // Major pentatonic
+      [0, 3, 5, 7, 10], // Minor pentatonic
+      [0, 2, 3, 5, 7, 8, 11] // Harmonic minor
+    ];
+    const scale = scales[Math.floor(Math.random() * scales.length)];
+    const root = 48 + Math.floor(Math.random() * 12);
+
+    this._steps = this._steps.map((s, i) => {
+      const degree = scale[Math.floor(Math.random() * scale.length)];
+      return {
+        note: root + degree + (Math.random() > 0.8 ? 12 : 0) - (Math.random() > 0.9 ? 12 : 0),
+        gate: pattern[i]
+      };
+    });
+    
+    this.synth.setPattern(this._steps);
+  }
+
+  mutateParams() {
+    const type = Math.random();
+    // 0: Sine, 1: Tri, 2: Saw, 3: Sq (or 0-1 mapped)
+    if (type < 0.33) {
+      // Plucky Bass/Arp
+      this.setSynthParam('waveform', 0.66 + Math.random() * 0.34); // Saw/Square
+      this.setSynthParam('cutoff', 0.1 + Math.random() * 0.2);
+      this.setSynthParam('resonance', 0.4 + Math.random() * 0.4);
+      this.setSynthParam('attack', 0.0);
+      this.setSynthParam('release', 0.1 + Math.random() * 0.3);
+    } else if (type < 0.66) {
+      // Atmospheric Pad
+      this.setSynthParam('waveform', Math.random() * 0.5); // Sine/Tri
+      this.setSynthParam('cutoff', 0.3 + Math.random() * 0.4);
+      this.setSynthParam('resonance', Math.random() * 0.3);
+      this.setSynthParam('attack', 0.6 + Math.random() * 0.4);
+      this.setSynthParam('release', 0.6 + Math.random() * 0.4);
+    } else {
+      // Aggressive Synth (Brass/Lead)
+      this.setSynthParam('waveform', 0.66 + Math.random() * 0.34);
+      this.setSynthParam('cutoff', 0.5 + Math.random() * 0.5);
+      this.setSynthParam('resonance', 0.2 + Math.random() * 0.6);
+      this.setSynthParam('attack', 0.1 + Math.random() * 0.2);
+      this.setSynthParam('release', 0.3 + Math.random() * 0.3);
+    }
   }
 
   get synthParams() { return this._synthParams; }

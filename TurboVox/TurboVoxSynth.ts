@@ -1,51 +1,45 @@
-import { TurboVoxWasm } from 'turbovox-wasm';
 import { TurboVoxStep } from './types';
 
 export class TurboVoxSynth {
   private ctx: AudioContext;
-  private processor!: ScriptProcessorNode;
-  private wasmEngine!: TurboVoxWasm;
+  private node!: AudioWorkletNode;
   private destination!: AudioNode;
 
   constructor(ctx: AudioContext) {
     this.ctx = ctx;
-    this.wasmEngine = new TurboVoxWasm();
-    
-    this.processor = ctx.createScriptProcessor(1024, 0, 1);
-    
-    this.processor.onaudioprocess = (e) => {
-      const outputBuffer = e.outputBuffer;
-      const channelData = outputBuffer.getChannelData(0);
-      this.wasmEngine.process(channelData);
-      
-      if (outputBuffer.numberOfChannels > 1) {
-         outputBuffer.getChannelData(1).set(channelData);
-      }
-    };
+  }
+  
+  async init() {
+    await this.ctx.audioWorklet.addModule(new URL('./TurboVoxProcessor.ts', import.meta.url));
+    this.node = new AudioWorkletNode(this.ctx, 'turbovox-processor', {
+      numberOfInputs: 0,
+      numberOfOutputs: 1,
+      outputChannelCount: [2]
+    });
   }
 
   connect(destination: AudioNode) {
     this.destination = destination;
-    this.processor.connect(destination);
+    this.node.connect(destination);
   }
 
   destroy() {
-    this.processor.disconnect();
-    this.wasmEngine.free();
+    this.node.port.postMessage({ id: 'free' });
+    this.node.disconnect();
   }
 
-  setRunning(running: boolean) { this.wasmEngine.set_running(running); }
-  setTempo(tempo: number) { this.wasmEngine.set_tempo(tempo); }
+  setRunning(running: boolean) { this.node.port.postMessage({ id: 'setRunning', value: running }); }
+  setTempo(tempo: number) { this.node.port.postMessage({ id: 'setTempo', value: tempo }); }
   
   setPattern(steps: TurboVoxStep[]) {
     const rawPattern = steps.map(s => [s.note, s.gate]);
-    this.wasmEngine.set_pattern(rawPattern);
+    this.node.port.postMessage({ id: 'setPattern', value: rawPattern });
   }
 
-  setMorph(v: number) { this.wasmEngine.set_morph(v); }
-  setVibrato(v: number) { this.wasmEngine.set_vibrato(v); }
-  setGlide(v: number) { this.wasmEngine.set_glide(v); }
-  setLfoRate(v: number) { this.wasmEngine.set_lfo_rate(v); }
-  setAttack(v: number) { this.wasmEngine.set_attack(v); }
-  setDecay(v: number) { this.wasmEngine.set_decay(v); }
+  setMorph(v: number) { this.node.port.postMessage({ id: 'setMorph', value: v }); }
+  setVibrato(v: number) { this.node.port.postMessage({ id: 'setVibrato', value: v }); }
+  setGlide(v: number) { this.node.port.postMessage({ id: 'setGlide', value: v }); }
+  setLfoRate(v: number) { this.node.port.postMessage({ id: 'setLfoRate', value: v }); }
+  setAttack(v: number) { this.node.port.postMessage({ id: 'setAttack', value: v }); }
+  setDecay(v: number) { this.node.port.postMessage({ id: 'setDecay', value: v }); }
 }

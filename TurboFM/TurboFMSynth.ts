@@ -1,52 +1,46 @@
-import { TurboFMWasm } from 'turbofm-wasm';
 import { TurboFMStep } from './types';
 
 export class TurboFMSynth {
   private ctx: AudioContext;
-  private processor!: ScriptProcessorNode;
-  private wasmEngine!: TurboFMWasm;
+  private node!: AudioWorkletNode;
   private destination!: AudioNode;
 
   constructor(ctx: AudioContext) {
     this.ctx = ctx;
-    this.wasmEngine = new TurboFMWasm();
-    
-    this.processor = ctx.createScriptProcessor(1024, 0, 1);
-    
-    this.processor.onaudioprocess = (e) => {
-      const outputBuffer = e.outputBuffer;
-      const channelData = outputBuffer.getChannelData(0);
-      this.wasmEngine.process(channelData);
-      
-      if (outputBuffer.numberOfChannels > 1) {
-         outputBuffer.getChannelData(1).set(channelData);
-      }
-    };
+  }
+  
+  async init() {
+    await this.ctx.audioWorklet.addModule(new URL('./TurboFMProcessor.ts', import.meta.url));
+    this.node = new AudioWorkletNode(this.ctx, 'turbofm-processor', {
+      numberOfInputs: 0,
+      numberOfOutputs: 1,
+      outputChannelCount: [2]
+    });
   }
 
   connect(destination: AudioNode) {
     this.destination = destination;
-    this.processor.connect(destination);
+    this.node.connect(destination);
   }
 
   destroy() {
-    this.processor.disconnect();
-    this.wasmEngine.free();
+    this.node.port.postMessage({ id: 'free' });
+    this.node.disconnect();
   }
 
-  setRunning(running: boolean) { this.wasmEngine.set_running(running); }
-  setTempo(tempo: number) { this.wasmEngine.set_tempo(tempo); }
+  setRunning(running: boolean) { this.node.port.postMessage({ id: 'setRunning', value: running }); }
+  setTempo(tempo: number) { this.node.port.postMessage({ id: 'setTempo', value: tempo }); }
   setPattern(steps: TurboFMStep[]) {
     const rawPattern = steps.map(s => [s.note, s.gate]);
-    this.wasmEngine.set_pattern(rawPattern);
+    this.node.port.postMessage({ id: 'setPattern', value: rawPattern });
   }
 
-  setAlgo(algo: number) { this.wasmEngine.set_algo(algo); }
-  setFeedback(fb: number) { this.wasmEngine.set_feedback(fb); }
-  setCarAttack(a: number) { this.wasmEngine.set_car_attack(a); }
-  setCarDecay(d: number) { this.wasmEngine.set_car_decay(d); }
-  setModAttack(a: number) { this.wasmEngine.set_mod_attack(a); }
-  setModDecay(d: number) { this.wasmEngine.set_mod_decay(d); }
-  setOpRatio(op: number, r: number) { this.wasmEngine.set_op_ratio(op, r); }
-  setOpLevel(op: number, l: number) { this.wasmEngine.set_op_level(op, l); }
+  setAlgo(algo: number) { this.node.port.postMessage({ id: 'setAlgo', value: algo }); }
+  setFeedback(fb: number) { this.node.port.postMessage({ id: 'setFeedback', value: fb }); }
+  setCarAttack(a: number) { this.node.port.postMessage({ id: 'setCarAttack', value: a }); }
+  setCarDecay(d: number) { this.node.port.postMessage({ id: 'setCarDecay', value: d }); }
+  setModAttack(a: number) { this.node.port.postMessage({ id: 'setModAttack', value: a }); }
+  setModDecay(d: number) { this.node.port.postMessage({ id: 'setModDecay', value: d }); }
+  setOpRatio(op: number, r: number) { this.node.port.postMessage({ id: 'setOpRatio', op, value: r }); }
+  setOpLevel(op: number, l: number) { this.node.port.postMessage({ id: 'setOpLevel', op, value: l }); }
 }

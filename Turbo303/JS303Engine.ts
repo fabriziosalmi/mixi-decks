@@ -161,6 +161,75 @@ export class JS303Engine {
     this.synth.setPattern(this._steps);
   }
 
+  mutateSequence() {
+    // Intelligent Acid Pattern Generator
+    const scales = [
+      [0, 3, 5, 7, 10], // Minor Pentatonic
+      [0, 2, 3, 5, 7, 8, 10], // Natural Minor
+      [0, 1, 4, 5, 7, 8, 11] // Phrygian Dominant (exotic acid)
+    ];
+    const scale = scales[Math.floor(Math.random() * scales.length)];
+    const root = 36 + Math.floor(Math.random() * 12); // Base octave (C2-B2)
+
+    this._steps = this._steps.map((_, i) => {
+      // 60% chance of note, 40% rest
+      const isGate = Math.random() > 0.4;
+      
+      // Accents primarily on upbeats or randomly
+      const isAccent = isGate && (i % 2 !== 0 ? Math.random() > 0.3 : Math.random() > 0.8);
+      
+      // Slides often connect two active notes
+      const isSlide = isGate && Math.random() > 0.7;
+
+      // Select random note from scale
+      const degree = scale[Math.floor(Math.random() * scale.length)];
+      
+      // Octave jumps (up or down)
+      let octave = 0;
+      const oRand = Math.random();
+      if (oRand > 0.8) octave = 12; // Up one octave
+      else if (oRand > 0.95) octave = 24; // Up two
+      else if (oRand < 0.1) octave = -12; // Down one
+      
+      return {
+        note: root + degree + octave,
+        accent: isAccent,
+        slide: isSlide,
+        gate: isGate,
+        down: octave < 0,
+        up: octave > 0
+      };
+    });
+    this.synth.setPattern(this._steps);
+  }
+
+  mutateParams() {
+    // Acid Parameter Sweet Spots
+    const type = Math.random();
+    
+    if (type < 0.33) {
+      // Classic Squely Acid: Low cutoff, high res, high env mod, fast decay
+      this.setSynthParam('cutoff', Math.random() * 0.2); 
+      this.setSynthParam('resonance', 0.8 + Math.random() * 0.2);
+      this.setSynthParam('envMod', 0.7 + Math.random() * 0.3);
+      this.setSynthParam('decay', 0.1 + Math.random() * 0.3);
+      this.setSynthParam('waveform', Math.random() > 0.5 ? 1 : 0);
+    } else if (type < 0.66) {
+      // Smooth Bass: Low/Mid cutoff, low res, low env mod, medium decay
+      this.setSynthParam('cutoff', 0.2 + Math.random() * 0.3); 
+      this.setSynthParam('resonance', Math.random() * 0.4);
+      this.setSynthParam('envMod', Math.random() * 0.3);
+      this.setSynthParam('decay', 0.4 + Math.random() * 0.4);
+      this.setSynthParam('waveform', 1); // Square usually better for solid bass
+    } else {
+      // Hollow/Laser: Mid cutoff, absolute max res, negative or short env, long decay
+      this.setSynthParam('cutoff', 0.4 + Math.random() * 0.4); 
+      this.setSynthParam('resonance', 0.9 + Math.random() * 0.1);
+      this.setSynthParam('envMod', 0.4 + Math.random() * 0.5);
+      this.setSynthParam('decay', 0.6 + Math.random() * 0.4);
+    }
+  }
+
   // --- Parameters ---
 
   get synthParams() { return this._synthParams; }

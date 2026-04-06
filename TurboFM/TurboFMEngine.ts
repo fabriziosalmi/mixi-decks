@@ -32,10 +32,12 @@ export class TurboFMEngine {
     this.deckId = deckId;
   }
 
-  init(ctx: AudioContext) {
+  async init(ctx: AudioContext) {
     this.ctx = ctx;
     this.bus = new TurboFMBus(this.ctx);
     this.synth = new TurboFMSynth(this.ctx);
+    
+    await this.synth.init();
     
     this.synth.connect(this.bus.input);
 
@@ -125,6 +127,65 @@ export class TurboFMEngine {
   resetPattern() {
     this._steps = defaultSteps();
     this.synth.setPattern(this._steps);
+  }
+
+  mutateSequence() {
+    // FM Sequences tend to be either plucky basslines or glassy arps
+    const hits = 3 + Math.floor(Math.random() * 10);
+    const offset = Math.floor(Math.random() * 8);
+
+    // Euclidean rhythm
+    let pattern: boolean[] = Array(STEP_COUNT).fill(false);
+    let bucket = 0;
+    for (let i = 0; i < STEP_COUNT; i++) {
+        bucket += hits;
+        if (bucket >= STEP_COUNT) {
+            bucket -= STEP_COUNT;
+            pattern[i] = true;
+        }
+    }
+    pattern = [...pattern.slice(offset), ...pattern.slice(0, offset)];
+
+    const scales = [
+      [0, 2, 3, 7, 8], // Japanese-inspired / Insen scale for FM Bells
+      [0, 2, 4, 5, 7, 9, 11], // Major
+      [0, 3, 5, 7, 10] // Minor Pentatonic
+    ];
+    const scale = scales[Math.floor(Math.random() * scales.length)];
+    const root = 36 + Math.floor(Math.random() * 24); // C2-C4
+
+    this._steps = this._steps.map((s, i) => {
+      const degree = scale[Math.floor(Math.random() * scale.length)];
+      return {
+        note: root + degree + (Math.random() > 0.8 ? 12 : 0),
+        gate: pattern[i]
+      };
+    });
+    this.synth.setPattern(this._steps);
+  }
+
+  mutateParams() {
+    // Smart FM Mutation: integer multiples sound musical (harmonic), fractional sound metallic/atonal
+    const isHarmonic = Math.random() > 0.3; // Mostly musical
+
+    this.setSynthParam('algo', Math.floor(Math.random() * 4)); // 0-3
+    this.setSynthParam('feedback', Math.random() < 0.5 ? 0 : Math.random()); 
+
+    const ratios: SynthParamId[] = ['op1Ratio', 'op2Ratio', 'op3Ratio', 'op4Ratio'];
+    
+    ratios.forEach(param => {
+       if (isHarmonic) {
+          // Snap ratio to common integer multiples or simple fractions: 0.5, 1, 2, 3, 4, 5, 7
+          const choices = [0.5, 1, 2, 3, 4, 5, 7];
+          // Maps to 0-1 range. Currently formula is: realRatio = 0.5 + norm * 9.5
+          // So norm = (realRatio - 0.5) / 9.5
+          const choice = choices[Math.floor(Math.random() * choices.length)];
+          this.setSynthParam(param, (choice - 0.5) / 9.5);
+       } else {
+          // Metallic chaos
+          this.setSynthParam(param, Math.random());
+       }
+    });
   }
 
   get synthParams() { return this._synthParams; }

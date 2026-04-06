@@ -31,10 +31,12 @@ export class TurboVoxEngine {
     this.deckId = deckId;
   }
 
-  init(ctx: AudioContext) {
+  async init(ctx: AudioContext) {
     this.ctx = ctx;
     this.bus = new TurboVoxBus(this.ctx);
     this.synth = new TurboVoxSynth(this.ctx);
+    
+    await this.synth.init();
     
     this.synth.connect(this.bus.input);
 
@@ -118,6 +120,68 @@ export class TurboVoxEngine {
   resetPattern() {
     this._steps = defaultSteps();
     this.synth.setPattern(this._steps);
+  }
+
+  mutateSequence() {
+    // Vocal styling: either robotic stutters or long evolving chants
+    const isRobotic = Math.random() > 0.5;
+    
+    // Rhythm generator
+    let pattern: boolean[] = Array(STEP_COUNT).fill(false);
+    if (isRobotic) {
+       // Stutters (many short notes)
+       const hits = 8 + Math.floor(Math.random() * 8);
+       for (let i = 0; i < STEP_COUNT; i++) {
+           if (Math.random() < hits / STEP_COUNT) pattern[i] = true;
+       }
+    } else {
+       // Chants (few long notes)
+       for (let i = 0; i < STEP_COUNT; i += 4) {
+           if (Math.random() > 0.3) pattern[i] = true;
+       }
+    }
+
+    const scale = [0, 2, 4, 7, 9]; // Pentatonic works best for vocals
+    const root = 48 + Math.floor(Math.random() * 12); // C3-C4
+
+    this._steps = this._steps.map((s, i) => {
+      const degree = scale[Math.floor(Math.random() * scale.length)];
+      return {
+        note: root + degree + (Math.random() > 0.8 ? 12 : 0) - (Math.random() > 0.9 ? 12 : 0),
+        gate: pattern[i]
+      };
+    });
+    this.synth.setPattern(this._steps);
+  }
+
+  mutateParams() {
+    const type = Math.random();
+    
+    if (type < 0.33) {
+      // Alien/Robot chatter
+      this.setSynthParam('morph', Math.random());
+      this.setSynthParam('lfoRate', 0.8 + Math.random() * 0.2); // Fast LFO
+      this.setSynthParam('vibrato', 0.5 + Math.random() * 0.5);
+      this.setSynthParam('attack', 0.0);
+      this.setSynthParam('decay', 0.1 + Math.random() * 0.2);
+      this.setSynthParam('glide', 0.0);
+    } else if (type < 0.66) {
+      // Choir Pad
+      this.setSynthParam('morph', 0.2 + Math.random() * 0.6); // Ah/Eh
+      this.setSynthParam('lfoRate', Math.random() * 0.2); // Slow LFO
+      this.setSynthParam('vibrato', 0.2 + Math.random() * 0.3);
+      this.setSynthParam('attack', 0.5 + Math.random() * 0.5);
+      this.setSynthParam('decay', 0.7 + Math.random() * 0.3);
+      this.setSynthParam('glide', 0.5 + Math.random() * 0.5);
+    } else {
+      // Deep Monks
+      this.setSynthParam('morph', 0.8 + Math.random() * 0.2); // Oo/Uh
+      this.setSynthParam('lfoRate', Math.random() * 0.1); 
+      this.setSynthParam('vibrato', Math.random() * 0.2);
+      this.setSynthParam('attack', 0.3 + Math.random() * 0.4);
+      this.setSynthParam('decay', 0.5 + Math.random() * 0.5);
+      this.setSynthParam('glide', 0.8 + Math.random() * 0.2);
+    }
   }
 
   get synthParams() { return this._synthParams; }

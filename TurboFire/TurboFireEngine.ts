@@ -21,10 +21,11 @@ export class TurboFireEngine {
     this.deckId = deckId;
   }
 
-  init(ctx: AudioContext) {
+  async init(ctx: AudioContext) {
     this.ctx = ctx;
     this.bus = new TurboFireBus(this.ctx);
     this.synth = new TurboFireSynth(this.ctx);
+    await this.synth.init();
     this.synth.connect(this.bus.input);
     this.applyAllSynthParams();
   }
@@ -58,6 +59,26 @@ export class TurboFireEngine {
   setSynthParam(id: SynthParamId, value: number) {
     this._synthParams[id] = value;
     this.applySynthParam(id, value);
+  }
+
+  mutateParams() {
+    const type = Math.random();
+    if (type < 0.33) {
+      // Roaring fire
+      this.setSynthParam('warmth', 0.8 + Math.random() * 0.2);
+      this.setSynthParam('crackle', 0.6 + Math.random() * 0.4);
+      this.setSynthParam('wind', 0.1 + Math.random() * 0.2);
+    } else if (type < 0.66) {
+      // Windstorm
+      this.setSynthParam('warmth', 0.1 + Math.random() * 0.2);
+      this.setSynthParam('crackle', 0.0 + Math.random() * 0.2);
+      this.setSynthParam('wind', 0.7 + Math.random() * 0.3);
+    } else {
+      // Balanced Campfire
+      this.setSynthParam('warmth', 0.4 + Math.random() * 0.4);
+      this.setSynthParam('crackle', 0.3 + Math.random() * 0.4);
+      this.setSynthParam('wind', 0.3 + Math.random() * 0.3);
+    }
   }
 
   get fxParams() { return this._fxParams; }

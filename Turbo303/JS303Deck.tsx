@@ -60,6 +60,18 @@ export const JS303Deck: FC<HouseDeckProps> = ({ deckId, color, onSwitchToTrack }
     };
   }, [deckId]);
 
+  const handleMutateSeq = () => {
+    if (!engineRef.current) return;
+    engineRef.current.mutateSequence();
+    setSnapshot(s => ({ ...s, steps: [...engineRef.current!.steps] }));
+  };
+
+  const handleMutateSynth = () => {
+    if (!engineRef.current) return;
+    engineRef.current.mutateParams();
+    setSnapshot(s => ({ ...s, synth: { ...engineRef.current!.synthParams } }));
+  };
+
   if (!isReady || !engineRef.current) {
     return (
       <div className="flex flex-col h-full w-full bg-black/40 text-white rounded-lg p-4 font-mono items-center justify-center border border-gray-800">
@@ -92,9 +104,11 @@ export const JS303Deck: FC<HouseDeckProps> = ({ deckId, color, onSwitchToTrack }
   };
 
   return (
-    <div className="flex flex-col h-full w-full bg-black/40 text-white rounded-lg p-4 font-mono">
+    <div className="flex flex-col h-full w-full bg-[#0a0a0c]/60 backdrop-blur-md border border-white/10 shadow-[0_8px_32px_rgba(0,0,0,0.5)] text-white rounded-xl p-4 font-mono relative overflow-hidden group transition-all">
+      <div className="absolute inset-0 bg-gradient-to-br from-white/5 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-700 pointer-events-none" />
+      
       {/* HEADER */}
-      <div className="flex justify-between items-center mb-4 border-b border-gray-700 pb-2">
+      <div className="relative z-10 flex justify-between items-center mb-4 border-b border-white/10 pb-3">
         <div className="flex items-center gap-4">
           <span className="font-bold text-lg" style={{ color }}>DECK {deckId} [JS303]</span>
           <span>{snapshot.bpm} BPM</span>
@@ -108,25 +122,37 @@ export const JS303Deck: FC<HouseDeckProps> = ({ deckId, color, onSwitchToTrack }
       </div>
 
       {/* SEQUENCER */}
-      <div className="flex justify-between mb-8 gap-1">
+      <div className="flex justify-between mb-8 gap-1 relative z-10">
         {snapshot.steps.map((step, i) => (
           <div 
             key={i} 
             onClick={() => handleStepToggle(i)}
-            className={`flex-1 h-12 flex flex-col items-center justify-center cursor-pointer border ${
-              snapshot.currentStep === i ? 'border-white' : 'border-gray-800'
-            } ${step.gate ? 'bg-opacity-50' : 'bg-transparent'} transition`}
+            className={`flex-1 h-12 flex flex-col items-center justify-center cursor-pointer transition-all border ${
+              snapshot.currentStep === i ? 'border-white scale-105 shadow-[0_0_15px_rgba(255,255,255,0.4)] z-10' : 'border-white/10 hover:bg-white/5'
+            } ${step.gate ? 'bg-opacity-80 shadow-inner' : 'bg-black/30'}`}
             style={{ backgroundColor: step.gate ? color : undefined }}
           >
-            <div className="text-xs">{i + 1}</div>
+            <div className="text-[10px] opacity-70 font-bold">{i + 1}</div>
+            {step.accent && <div className="absolute top-0 w-full h-1 bg-white/70" />}
+            {step.slide && <div className="absolute bottom-0 w-full h-1 bg-white/50" />}
           </div>
         ))}
       </div>
 
       {/* BODY */}
-      <div className="flex flex-1 gap-8 mb-4">
+      <div className="relative z-10 flex flex-1 gap-8 mb-4 border border-white/10 p-3 rounded-lg bg-black/20 backdrop-blur shadow-inner">
         {/* SYNTH CONTROLS */}
-        <div className="grid grid-cols-4 gap-4 bg-black/20 p-4 rounded border border-gray-800">
+        <div className="flex-1 flex flex-col">
+          <div className="flex justify-between items-center mb-3 border-b border-white/5 pb-2">
+            <span className="text-[10px] tracking-widest font-bold text-gray-400">ANALOG CIRCUIT</span>
+            <button 
+              onClick={handleMutateSynth} 
+              className="text-[9px] text-[#00ffcc] hover:text-white px-2 py-1 rounded border border-[#00ffcc]/30 bg-[#00ffcc]/10 font-bold transition tracking-wider"
+            >
+              DICE SYNTH
+            </button>
+          </div>
+          <div className="grid grid-cols-4 gap-4 p-2">
           <Knob 
             label="Tune" value={snapshot.synth.tuning} 
             onChange={(v: number) => { engine.setSynthParam('tuning', v); setSnapshot(s => ({...s, synth: {...s.synth, tuning: v}})) }} 
@@ -151,11 +177,12 @@ export const JS303Deck: FC<HouseDeckProps> = ({ deckId, color, onSwitchToTrack }
             label="Accent" value={snapshot.synth.accent} 
             onChange={(v: number) => { engine.setSynthParam('accent', v); setSnapshot(s => ({...s, synth: {...s.synth, accent: v}})) }} 
           />
+          </div>
         </div>
 
         {/* FX CONTROLS */}
-        <div className="flex flex-col gap-4 bg-black/20 p-4 rounded border border-gray-800">
-          <div className="text-sm font-bold text-gray-500">DISTORTION</div>
+        <div className="flex flex-col gap-4 p-3 bg-white/5 border-l border-white/10 rounded-r-lg">
+          <div className="text-[10px] tracking-widest font-bold text-gray-400 border-b border-white/5 pb-2">DISTORTION</div>
           <div className="flex gap-4">
              <Knob label="Shape" value={snapshot.fx.distShape} onChange={(v: number) => engine.setFx('distShape', v)} />
              <Knob label="Clip" value={snapshot.fx.distThreshold} onChange={(v: number) => engine.setFx('distThreshold', v)} />
@@ -164,22 +191,29 @@ export const JS303Deck: FC<HouseDeckProps> = ({ deckId, color, onSwitchToTrack }
       </div>
 
       {/* TRANSPORT */}
-      <div className="flex justify-between items-center border-t border-gray-700 pt-4">
+      <div className="relative z-10 flex justify-between items-center border-t border-white/10 pt-4 mt-auto">
         <button 
           onClick={handlePlayToggle}
-          className="px-6 py-2 border rounded font-bold"
-          style={{ borderColor: snapshot.isPlaying ? color : 'gray', color: snapshot.isPlaying ? color : 'white' }}
+          className="px-8 py-2 border rounded-lg font-bold tracking-widest shadow-lg transition-all"
+          style={{ 
+            borderColor: snapshot.isPlaying ? color : 'rgba(255,255,255,0.2)', 
+            color: snapshot.isPlaying ? color : '#aaa',
+            backgroundColor: snapshot.isPlaying ? `${color}20` : 'transparent',
+            boxShadow: snapshot.isPlaying ? `0 0 20px ${color}40` : 'none'
+          }}
         >
-          {snapshot.isPlaying ? 'STOP' : 'ENGAGE'}
+          {snapshot.isPlaying ? 'RUNNING' : 'START'}
         </button>
         
-        <div className="flex gap-4 items-center">
+        <div className="flex gap-4 items-center bg-black/40 p-2 rounded-lg border border-white/5 backdrop-blur">
           <Knob 
             label="Volume" 
             value={snapshot.masterVolume} 
             onChange={(v: number) => { engine.masterVolume = v; setSnapshot(s => ({...s, masterVolume: v})) }} 
           />
-          <button onClick={() => engine.clearPattern()} className="px-3 py-1 bg-red-900/50 rounded">CLR</button>
+          <div className="w-[1px] h-6 bg-white/10 mx-1"></div>
+          <button onClick={() => engine.clearPattern()} className="px-3 py-1 bg-red-500/10 text-red-400 border border-red-500/30 rounded text-[10px] hover:bg-red-500/20 transition-colors">CLR</button>
+          <button onClick={handleMutateSeq} className="px-3 py-1 bg-[#00ffcc]/10 text-[#00ffcc] border border-[#00ffcc]/30 rounded text-[10px] font-bold hover:bg-[#00ffcc]/20 transition-colors tracking-wider">DICE SEQ</button>
         </div>
       </div>
     </div>

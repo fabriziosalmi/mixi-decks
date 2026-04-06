@@ -6,7 +6,7 @@
 
 Mixi Decks is a strictly typed library of high-performance drop-in plugins for the Mixi web-based DJ platform. These decks function as standalone modular instruments, generative synthesizers, and esoteric data audiolizers designed to perfectly integrate within the Mixi master mixer and transport architecture.
 
-The core philosophy revolves around utilizing optimal processing layers based on synthesis complexity: computational-heavy logic (e.g., frequency-modulation, phase-distortion) runs on Rust-compiled WebAssembly, whereas procedural, atmospheric, and mathematical engines utilize native WebAudio `ScriptProcessor` and `AudioWorklet` nodes to achieve zero external dependencies.
+The core philosophy revolves around utilizing optimal processing layers based on synthesis complexity: computational-heavy logic (e.g., frequency-modulation, phase-distortion) runs on Rust-compiled WebAssembly, whereas procedural, atmospheric, and mathematical engines utilize modern native WebAudio `AudioWorklet` nodes to achieve zero external dependencies.
 
 ## Architecture & Integration
 
@@ -20,6 +20,14 @@ To integrate a new deck into the Mixi host application:
 1. Move the specific `<PluginName>/` TS directory and `<plugin-wasm>` folder into `src/decks/`.
 2. Assign the TS entry point within `src/decks/index.ts`.
 3. Include the matching `DeckId`.
+
+## Architectural Revisions
+
+### Phase 4: Stochastic Generative Intelligence
+All engines implement mathematical randomized algorithms to generate cohesive sequences and synthesis parameter mutations on the fly (accessed via `DICE` logic). Methods employed include Euclidean rhythm division, Markov chain scale walks, pentatonic restraints for FM fractional ratios, and deterministic Poisson point process models for radioactive decay intervals.
+
+### Phase 5: Translucent Rendering Pipeline (Glassmorphism)
+The user interface utilizes an advanced translucent glassmorphism design system. Relying heavily on hardware-accelerated CSS `backdrop-blur`, the components enforce an immersive, overlay-ready aesthetic. The DOM structure separates dynamic gradients and micro-animations into distinct layers to prohibit Main-Thread rendering jank and maintain strict WebAudio clock priority.
 
 ---
 
@@ -47,7 +55,7 @@ WASM-powered vocal morphing algorithm operating across three parallel bandpass f
 
 ### TurboFire
 Procedural ASMR ambient generator.
-Bypasses WASM to run directly on the WebAudio API `ScriptProcessor`, combining Paul Kellett's algorithm for Pink Noise (routed through dynamic lowpass filters for `Warmth`), stochastic high-amplitude sparse impulses for `Crackle`, and an LFO-modulated white noise for background `Wind` turbulence.
+Bypasses WASM to run directly on a high-performance WebAudio API `AudioWorklet` thread, combining Paul Kellett's algorithm for Pink Noise (routed through dynamic lowpass filters for `Warmth`), stochastic high-amplitude sparse impulses for `Crackle`, and an LFO-modulated white noise for background `Wind` turbulence.
 
 ### TurboRadio
 Icecast/Shoutcast stream capturer.

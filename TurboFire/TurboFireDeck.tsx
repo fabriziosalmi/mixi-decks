@@ -29,16 +29,44 @@ export const TurboFireDeck: FC<HouseDeckProps> = ({ deckId, color, onSwitchToTra
   });
 
   const engineRef = useRef<TurboFireEngine | null>(null);
+  const [isReady, setIsReady] = useState(false);
 
   useEffect(() => {
     const engine = new TurboFireEngine(deckId);
-    engine.init(new window.AudioContext());
-    engineRef.current = engine;
-    return () => engine.destroy();
+    const ctx = new window.AudioContext();
+    
+    let isMounted = true;
+    engine.init(ctx).then(() => {
+      if (isMounted) {
+        engineRef.current = engine;
+        setIsReady(true);
+      }
+    });
+    
+    return () => {
+      isMounted = false;
+      engine.destroy();
+      ctx.close();
+    };
   }, [deckId]);
 
-  if (!engineRef.current) return null;
+  if (!isReady || !engineRef.current) {
+    return (
+      <div className="flex flex-col h-full w-full bg-black/80 text-white rounded-lg p-4 font-mono items-center justify-center border border-[#ff6600]/30 shadow-[0_0_30px_rgb(255,100,0,0.1)]">
+        <div className="animate-pulse flex flex-col items-center gap-4">
+          <div className="w-12 h-12 rounded-full border-t-2 border-b-2" style={{ borderColor: '#ff6600', animation: 'spin 1s linear infinite' }} />
+          <span className="text-xs tracking-widest text-[#ffbb00]">BOOTING AUDIOWORKLET...</span>
+        </div>
+      </div>
+    );
+  }
+  
   const engine = engineRef.current;
+
+  const handleMutateSynth = () => {
+    engine.mutateParams();
+    setSnapshot(s => ({ ...s, synth: { ...engine.synthParams } }));
+  };
 
   const handlePlayToggle = () => {
     if (snapshot.isPlaying) {
@@ -79,8 +107,9 @@ export const TurboFireDeck: FC<HouseDeckProps> = ({ deckId, color, onSwitchToTra
         </div>
 
         {/* BODY - EXPERIMENTAL NOISE CONTROLS */}
-        <div className="flex flex-col flex-1 justify-center items-center gap-8 mb-6">
-          <div className="flex gap-8 bg-black/60 backdrop-blur-md p-6 rounded-2xl border border-[#ff6600]/20 shadow-2xl">
+        <div className="relative z-10 flex flex-col flex-1 justify-center items-center gap-8 mb-6 mt-8">
+          <div className="flex gap-8 bg-black/40 backdrop-blur-xl p-8 rounded-3xl border border-[#ff6600]/30 shadow-[0_0_30px_rgba(255,102,0,0.15)] group relative overflow-hidden">
+            <div className="absolute inset-0 bg-gradient-to-t from-[#ff6600]/5 to-transparent pointer-events-none opacity-0 group-hover:opacity-100 transition-opacity duration-1000" />
             <Knob 
               label="WARMTH" 
               value={snapshot.synth.warmth} 
@@ -100,7 +129,7 @@ export const TurboFireDeck: FC<HouseDeckProps> = ({ deckId, color, onSwitchToTra
         </div>
 
         {/* TRANSPORT */}
-        <div className="flex justify-between items-center border-t border-[#ff6600]/30 pt-4 bg-black/40 backdrop-blur p-2 rounded">
+        <div className="relative z-10 flex justify-between items-center border-t border-[#ff6600]/30 pt-4 bg-black/40 backdrop-blur-md p-3 rounded-xl shadow-inner">
           <button 
             onClick={handlePlayToggle}
             className="px-8 py-3 border-2 rounded font-bold tracking-widest"
@@ -114,12 +143,14 @@ export const TurboFireDeck: FC<HouseDeckProps> = ({ deckId, color, onSwitchToTra
             {snapshot.isPlaying ? 'IGNITED' : 'IGNITE'}
           </button>
           
-          <div className="flex gap-4 items-center">
+          <div className="flex gap-4 items-center bg-black/50 p-2 rounded-lg border border-white/5">
             <Knob 
               label="Volume" 
               value={snapshot.masterVolume} 
               onChange={(v: number) => { engine.masterVolume = v; setSnapshot(s => ({...s, masterVolume: v})) }} 
             />
+            <div className="w-[1px] h-6 bg-white/10 mx-1"></div>
+            <button onClick={handleMutateSynth} className="px-3 py-1 bg-[#ff6600]/10 border border-[#ff6600]/30 text-[#ff6600] rounded font-mono text-[10px] font-bold hover:bg-[#ff6600]/20 transition tracking-wider">DICE ENV</button>
           </div>
         </div>
       </div>
