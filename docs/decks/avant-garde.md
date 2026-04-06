@@ -20,14 +20,6 @@ Biological sequence arpeggiator.
 
 ---
 
-## TurboTicker (Economics)
-Psychoacoustic financial arbitrage. 
-
-* **The Input:** Connects directly into live Cryptographic exchanges (Binance BTC/USD) polling the market trend dynamically.
-* **The Output:** Maps the current price action to an infinite Shepard Tone glissando paradox. As the market Inflates, pitch tension rises eternally. As it crashes, it descends into the abyss.
-
----
-
 ## TurboMorse (Cryptography)
 Cryptography war transmitter. 
 

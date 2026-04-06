@@ -8,7 +8,8 @@ export interface HouseDeckProps {
   onSwitchToTrack: () => void;
 }
 
-const Knob: FC<any> = ({ value, label, onChange, size = 'normal' }) => (
+export interface KnobProps { value: number; label: string; onChange: (v: number) => void; size?: string; }
+const Knob: FC<KnobProps> = ({ value, label, onChange, size = 'normal' }) => (
   <div className="flex flex-col items-center">
     <span className="text-[10px] text-gray-400 font-mono truncate max-w-[60px]">{label}</span>
     <input 

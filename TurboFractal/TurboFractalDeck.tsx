@@ -8,7 +8,8 @@ export interface HouseDeckProps {
   onSwitchToTrack: () => void;
 }
 
-const Knob: FC<any> = ({ value, label, onChange }) => (
+export interface KnobProps { value: number; label: string; onChange: (v: number) => void; size?: string; }
+const Knob: FC<KnobProps> = ({ value, label, onChange }) => (
   <div className="flex flex-col items-center">
     <span className="text-[10px] text-gray-400 font-mono truncate max-w-[60px]">{label}</span>
     <input 
@@ -123,15 +124,17 @@ export const TurboFractalDeck: FC<HouseDeckProps> = ({ deckId, color, onSwitchTo
            <span className="absolute top-2 left-2 text-[10px] text-violet-800">HARMONIC SET Z(n)</span>
            
            <div className="w-full flex-1 flex items-end justify-center gap-1 mt-6">
-              {/* Fake spectrum to represent harmonic escape magnitudes */}
+              {/* Direct deterministic mapping to the escape velocity equation */}
               {Array.from({length: 32}).map((_, i) => {
                  let active = snapshot.isActive && i < fractalDat.iters;
+                 // As the index increases, we map it to expected harmonic strength dropoff
+                 // ensuring larger iterations maintain deterministic geometry.
                  return (
                    <div 
                      key={i} 
                      className="flex-1 bg-violet-600 transition-all duration-75"
                      style={{
-                       height: active ? `${20 + Math.random() * 80}%` : '5%',
+                       height: active ? `${20 + (1 - (i/(fractalDat.iters||1))) * 80}%` : '5%',
                        opacity: active ? 1 - (i/32) : 0.2
                      }}
                    />

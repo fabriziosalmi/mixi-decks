@@ -1,11 +1,6 @@
 import React, { useState, useEffect, useRef, FC } from 'react';
 import { JS303Engine, DeckId } from './JS303Engine';
 import { JS303Snapshot, defaultSynth, defaultFx, defaultSteps } from './types';
-// Note: imports mocked per user spec
-// import { Knob } from '../../components/controls/Knob';
-// import type { HouseDeckProps } from '../index';
-// import { MixiEngine } from '../../Engine';
-
 export interface HouseDeckProps {
   deckId: DeckId;
   color: string;
@@ -13,7 +8,8 @@ export interface HouseDeckProps {
 }
 
 // Mock Knob for compilation completeness
-const Knob: FC<any> = ({ value, label, onChange }) => (
+export interface KnobProps { value: number; label: string; onChange: (v: number) => void; size?: string; }
+const Knob: FC<KnobProps> = ({ value, label, onChange }) => (
   <div className="flex flex-col items-center">
     <span>{label}</span>
     <input 
@@ -40,11 +36,6 @@ export const JS303Deck: FC<HouseDeckProps> = ({ deckId, color, onSwitchToTrack }
 
   useEffect(() => {
     const engine = new JS303Engine(deckId);
-    
-    // Fictional call to get AudioContext
-    // engine.init(MixiEngine.getInstance().getAudioContext());
-    
-    // MOCK for standalone compilation:
     const ctx = new window.AudioContext();
     engine.init(ctx);
     

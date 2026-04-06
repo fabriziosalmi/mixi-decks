@@ -47,7 +47,7 @@ export class TurboNewsEngine {
       const data = await res.json();
       
       if (data.status === 'ok') {
-        const items = data.items.map((item: any) => ({
+        const items = data.items.map((item: Record<string, string>) => ({
           title: item.title,
           pubDate: item.pubDate
         }));
@@ -57,8 +57,8 @@ export class TurboNewsEngine {
       } else {
         throw new Error(data.message || 'Failed to parse RSS');
       }
-    } catch (err: any) {
-      this.setStatus('error', err.message);
+    } catch (err: unknown) {
+      this.setStatus('error', err instanceof Error ? err.message : String(err));
     }
   }
 

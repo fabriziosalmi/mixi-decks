@@ -90,9 +90,6 @@ Astrophysical metronome. Emulates the precise rotational period of neutron stars
 ### TurboGenome (Biology)
 Biological sequence arpeggiator. Crawls through literal DNA nucleotide strings (Adenine, Cytosine, Guanine, Thymine) via a Markov chain, converting genetic bonds into mathematically scaled acidic synth arpeggios. Features real-time artificial mutation rates.
 
-### TurboTicker (Economics)
-Psychoacoustic financial arbitrage. Connects to live Crypto APIs (BTC/USD) mapping the current price to an infinite Shepard Tone glissando. As the market Inflates, tension rises eternally. As it crashes, it descends into the abyss.
-
 ### TurboMorse (Cryptography)
 Cryptography war transmitter. Encodes arbitrary text into military-grade Telegraph signals (Dots and Dashes) played through an overcranked, hard-clipping WaveShaper node. Ideal for injecting raw, distorted subliminal codes into the mix.
 

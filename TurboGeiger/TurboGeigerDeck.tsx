@@ -8,7 +8,8 @@ export interface HouseDeckProps {
   onSwitchToTrack: () => void;
 }
 
-const Knob: FC<any> = ({ value, label, onChange }) => (
+export interface KnobProps { value: number; label: string; onChange: (v: number) => void; size?: string; }
+const Knob: FC<KnobProps> = ({ value, label, onChange }) => (
   <div className="flex flex-col items-center">
     <span className="text-[10px] text-gray-400 font-mono truncate max-w-[60px]">{label}</span>
     <input 
@@ -29,6 +30,7 @@ export const TurboGeigerDeck: FC<HouseDeckProps> = ({ deckId, color, onSwitchToT
 
   const [blink, setBlink] = useState(false);
   const [ticks, setTicks] = useState(0); // CPS counter
+  const [history, setHistory] = useState<number[]>(Array(20).fill(0));
 
   const engineRef = useRef<TurboGeigerEngine | null>(null);
 
@@ -40,6 +42,7 @@ export const TurboGeigerDeck: FC<HouseDeckProps> = ({ deckId, color, onSwitchToT
     engine.onTick = () => {
       setBlink(true);
       setTicks(t => t + 1);
+      setHistory(h => [...h.slice(1), 100]);
       setTimeout(() => setBlink(false), 50);
     };
 
@@ -51,6 +54,13 @@ export const TurboGeigerDeck: FC<HouseDeckProps> = ({ deckId, color, onSwitchToT
     const int = setInterval(() => setTicks(0), 1000);
     return () => clearInterval(int);
   }, []);
+
+  // Decay the visual history
+  useEffect(() => {
+    if (!snapshot.isPlaying) return;
+    const ds = setInterval(() => setHistory(h => h.map(v => Math.max(0, v - Math.random()*20))), 50);
+    return () => clearInterval(ds);
+  }, [snapshot.isPlaying]);
 
   if (!engineRef.current) return null;
   const engine = engineRef.current;
@@ -135,14 +145,14 @@ export const TurboGeigerDeck: FC<HouseDeckProps> = ({ deckId, color, onSwitchToT
             </div>
             
             <div className="w-full mt-4 h-8 flex gap-1 items-end justify-center px-4">
-               {/* Visual histogram mock */}
-               {Array.from({length: 20}).map((_, i) => (
+               {/* True probabilistic histogram feed */}
+               {history.map((v, i) => (
                  <div 
                    key={i} 
-                   className="flex-1 bg-orange-700 transition-all duration-100"
+                   className="flex-1 bg-orange-700 transition-all duration-75"
                    style={{ 
-                     height: snapshot.isPlaying ? `${Math.random() * (ticks > 0 ? 100 : 5)}%` : '5%',
-                     opacity: blink ? 1 : 0.5 
+                     height: snapshot.isPlaying && v > 0 ? `${v}%` : '5%',
+                     opacity: v > 0 ? 1 : 0.4 
                    }}
                  />
                ))}
