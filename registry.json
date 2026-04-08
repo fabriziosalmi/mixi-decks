@@ -1,0 +1,242 @@
+[
+  {
+    "id": "turbo303",
+    "mode": "turbo-303",
+    "label": "TURBO 303",
+    "accentColor": "#00ff88",
+    "description": "Acid bass synth with 4-pole ladder filter",
+    "author": "MIXI Community",
+    "version": "1.0.0",
+    "esmEntry": "https://fabriziosalmi.github.io/mixi-decks/Turbo303/index.mjs",
+    "minMixiVersion": "0.4.0",
+    "tags": [
+      "synth",
+      "instrument"
+    ]
+  },
+  {
+    "id": "turboboid",
+    "mode": "turbo-boid",
+    "label": "TURBOBOID",
+    "accentColor": "#ff6b9d",
+    "description": "Flocking particle synthesis — boid-driven sound",
+    "author": "MIXI Community",
+    "version": "1.0.0",
+    "esmEntry": "https://fabriziosalmi.github.io/mixi-decks/TurboBoid/index.mjs",
+    "minMixiVersion": "0.4.0",
+    "tags": [
+      "synth",
+      "instrument"
+    ]
+  },
+  {
+    "id": "turbobrain",
+    "mode": "turbo-brain",
+    "label": "TURBOBRAIN",
+    "accentColor": "#c084fc",
+    "description": "Neural network audio synthesis",
+    "author": "MIXI Community",
+    "version": "1.0.0",
+    "esmEntry": "https://fabriziosalmi.github.io/mixi-decks/TurboBrain/index.mjs",
+    "minMixiVersion": "0.4.0",
+    "tags": [
+      "synth",
+      "instrument"
+    ]
+  },
+  {
+    "id": "turbocam",
+    "mode": "turbo-cam",
+    "label": "TURBOCAM",
+    "accentColor": "#34d399",
+    "description": "Camera-reactive audio synthesis",
+    "author": "MIXI Community",
+    "version": "1.0.0",
+    "esmEntry": "https://fabriziosalmi.github.io/mixi-decks/TurboCam/index.mjs",
+    "minMixiVersion": "0.4.0",
+    "tags": [
+      "synth",
+      "instrument"
+    ]
+  },
+  {
+    "id": "turbofm",
+    "mode": "turbo-fm",
+    "label": "TURBO FM",
+    "accentColor": "#f97316",
+    "description": "FM synthesis — DX7-inspired 6-operator",
+    "author": "MIXI Community",
+    "version": "1.0.0",
+    "esmEntry": "https://fabriziosalmi.github.io/mixi-decks/TurboFM/index.mjs",
+    "minMixiVersion": "0.4.0",
+    "tags": [
+      "synth",
+      "instrument"
+    ]
+  },
+  {
+    "id": "turbofire",
+    "mode": "turbo-fire",
+    "label": "TURBOFIRE",
+    "accentColor": "#ef4444",
+    "description": "Fire particle audio — crackling flame synth",
+    "author": "MIXI Community",
+    "version": "1.0.0",
+    "esmEntry": "https://fabriziosalmi.github.io/mixi-decks/TurboFire/index.mjs",
+    "minMixiVersion": "0.4.0",
+    "tags": [
+      "synth",
+      "instrument"
+    ]
+  },
+  {
+    "id": "turbofractal",
+    "mode": "turbo-fractal",
+    "label": "TURBOFRACTAL",
+    "accentColor": "#8b5cf6",
+    "description": "Fractal math sonification — Mandelbrot audio",
+    "author": "MIXI Community",
+    "version": "1.0.0",
+    "esmEntry": "https://fabriziosalmi.github.io/mixi-decks/TurboFractal/index.mjs",
+    "minMixiVersion": "0.4.0",
+    "tags": [
+      "synth",
+      "instrument"
+    ]
+  },
+  {
+    "id": "turbogeiger",
+    "mode": "turbo-geiger",
+    "label": "TURBOGEIGER",
+    "accentColor": "#fbbf24",
+    "description": "Geiger counter rhythms — radioactive clicks",
+    "author": "MIXI Community",
+    "version": "1.0.0",
+    "esmEntry": "https://fabriziosalmi.github.io/mixi-decks/TurboGeiger/index.mjs",
+    "minMixiVersion": "0.4.0",
+    "tags": [
+      "synth",
+      "instrument"
+    ]
+  },
+  {
+    "id": "turbogenome",
+    "mode": "turbo-genome",
+    "label": "TURBOGENOME",
+    "accentColor": "#10b981",
+    "description": "DNA sequence sonification",
+    "author": "MIXI Community",
+    "version": "1.0.0",
+    "esmEntry": "https://fabriziosalmi.github.io/mixi-decks/TurboGenome/index.mjs",
+    "minMixiVersion": "0.4.0",
+    "tags": [
+      "synth",
+      "instrument"
+    ]
+  },
+  {
+    "id": "turbomorse",
+    "mode": "turbo-morse",
+    "label": "TURBOMORSE",
+    "accentColor": "#06b6d4",
+    "description": "Morse code rhythmic sequencer",
+    "author": "MIXI Community",
+    "version": "1.0.0",
+    "esmEntry": "https://fabriziosalmi.github.io/mixi-decks/TurboMorse/index.mjs",
+    "minMixiVersion": "0.4.0",
+    "tags": [
+      "synth",
+      "instrument"
+    ]
+  },
+  {
+    "id": "turbonews",
+    "mode": "turbo-news",
+    "label": "TURBONEWS",
+    "accentColor": "#6366f1",
+    "description": "Text-to-rhythm — news feed sonification",
+    "author": "MIXI Community",
+    "version": "1.0.0",
+    "esmEntry": "https://fabriziosalmi.github.io/mixi-decks/TurboNews/index.mjs",
+    "minMixiVersion": "0.4.0",
+    "tags": [
+      "synth",
+      "instrument"
+    ]
+  },
+  {
+    "id": "turbopulsar",
+    "mode": "turbo-pulsar",
+    "label": "TURBOPULSAR",
+    "accentColor": "#a78bfa",
+    "description": "Pulsar synthesis — rotating neutron star audio",
+    "author": "MIXI Community",
+    "version": "1.0.0",
+    "esmEntry": "https://fabriziosalmi.github.io/mixi-decks/TurboPulsar/index.mjs",
+    "minMixiVersion": "0.4.0",
+    "tags": [
+      "synth",
+      "instrument"
+    ]
+  },
+  {
+    "id": "turbosonar",
+    "mode": "turbo-sonar",
+    "label": "TURBOSONAR",
+    "accentColor": "#22d3ee",
+    "description": "Sonar ping synthesis — underwater acoustics",
+    "author": "MIXI Community",
+    "version": "1.0.0",
+    "esmEntry": "https://fabriziosalmi.github.io/mixi-decks/TurboSonar/index.mjs",
+    "minMixiVersion": "0.4.0",
+    "tags": [
+      "synth",
+      "instrument"
+    ]
+  },
+  {
+    "id": "turbosynth",
+    "mode": "turbo-synth",
+    "label": "TURBOSYNTH",
+    "accentColor": "#f472b6",
+    "description": "Wavetable synthesizer with step sequencer",
+    "author": "MIXI Community",
+    "version": "1.0.0",
+    "esmEntry": "https://fabriziosalmi.github.io/mixi-decks/TurboSynth/index.mjs",
+    "minMixiVersion": "0.4.0",
+    "tags": [
+      "synth",
+      "instrument"
+    ]
+  },
+  {
+    "id": "turbovox",
+    "mode": "turbo-vox",
+    "label": "TURBOVOX",
+    "accentColor": "#fb923c",
+    "description": "Voice synthesis — formant-based vocal synth",
+    "author": "MIXI Community",
+    "version": "1.0.0",
+    "esmEntry": "https://fabriziosalmi.github.io/mixi-decks/TurboVox/index.mjs",
+    "minMixiVersion": "0.4.0",
+    "tags": [
+      "synth",
+      "instrument"
+    ]
+  },
+  {
+    "id": "turboweather",
+    "mode": "turbo-weather",
+    "label": "TURBOWEATHER",
+    "accentColor": "#2dd4bf",
+    "description": "Weather data sonification — wind, rain, thunder",
+    "author": "MIXI Community",
+    "version": "1.0.0",
+    "esmEntry": "https://fabriziosalmi.github.io/mixi-decks/TurboWeather/index.mjs",
+    "minMixiVersion": "0.4.0",
+    "tags": [
+      "synth",
+      "instrument"
+    ]
+  }
+]

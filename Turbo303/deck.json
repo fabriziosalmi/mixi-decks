@@ -1,0 +1,15 @@
+{
+  "id": "turbo303",
+  "mode": "turbo-303",
+  "label": "TURBO 303",
+  "accentColor": "#00ff88",
+  "description": "Acid bass synth with 4-pole ladder filter",
+  "author": "MIXI Community",
+  "version": "1.0.0",
+  "esmEntry": "https://fabriziosalmi.github.io/mixi-decks/Turbo303/index.mjs",
+  "minMixiVersion": "0.4.0",
+  "tags": [
+    "synth",
+    "instrument"
+  ]
+}
