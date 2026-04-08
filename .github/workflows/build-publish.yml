@@ -25,23 +25,34 @@ jobs:
           node-version: 20
           cache: npm
 
-      - name: Install dependencies
+      - name: Install root dependencies
         run: npm ci || npm install
 
       - name: Build all decks (ESM)
         run: node scripts/build-decks.mjs
 
-      - name: Verify output
+      - name: Build docs (VitePress)
         run: |
-          echo "Built decks:"
-          ls -la dist/*/index.mjs | awk '{print $5, $NF}'
-          echo "---"
-          echo "Registry: $(cat dist/registry.json | python3 -c 'import json,sys; print(len(json.load(sys.stdin)))')  decks"
+          cd docs
+          npm ci || npm install
+          npm run docs:build
+
+      - name: Merge deck builds + docs into single site
+        run: |
+          mkdir -p _site
+          # Deck ESM modules at root (registry.json + TurboX/index.mjs)
+          cp -r dist/* _site/
+          # VitePress docs under /docs/
+          if [ -d docs/.vitepress/dist ]; then
+            cp -r docs/.vitepress/dist _site/docs/
+          fi
+          echo "=== Site contents ==="
+          find _site -name "*.mjs" -o -name "*.json" | head -30
 
       - name: Upload Pages artifact
         uses: actions/upload-pages-artifact@v3
         with:
-          path: dist/
+          path: _site/
 
   deploy:
     needs: build
