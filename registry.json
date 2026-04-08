@@ -1,17 +1,18 @@
 [
   {
-    "id": "turbo303",
-    "mode": "turbo-303",
-    "label": "TURBO 303",
-    "accentColor": "#00ff88",
-    "description": "Acid bass synth with 4-pole ladder filter",
+    "id": "turboacid",
+    "mode": "turbo-acid",
+    "label": "TURBOACID",
+    "accentColor": "#39ff14",
+    "description": "Acid synth — 303-inspired squelch with AudioWorklet DSP",
     "author": "MIXI Community",
     "version": "1.0.0",
-    "esmEntry": "https://fabriziosalmi.github.io/mixi-decks/Turbo303/index.mjs",
+    "esmEntry": "https://fabriziosalmi.github.io/mixi-decks/TurboAcid/index.mjs",
     "minMixiVersion": "0.4.0",
     "tags": [
       "synth",
-      "instrument"
+      "acid",
+      "303"
     ]
   },
   {
@@ -147,6 +148,22 @@
     "tags": [
       "synth",
       "instrument"
+    ]
+  },
+  {
+    "id": "turbonature",
+    "mode": "turbo-nature",
+    "label": "TURBONATURE",
+    "accentColor": "#4ade80",
+    "description": "Nature soundscape synthesis — wind, rain, birds, forest",
+    "author": "MIXI Community",
+    "version": "1.0.0",
+    "esmEntry": "https://fabriziosalmi.github.io/mixi-decks/TurboNature/index.mjs",
+    "minMixiVersion": "0.4.0",
+    "tags": [
+      "ambient",
+      "nature",
+      "soundscape"
     ]
   },
   {
