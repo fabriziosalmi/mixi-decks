@@ -60,6 +60,44 @@ for (const dir of deckDirs) {
   fs.mkdirSync(outDir, { recursive: true });
 
   try {
+    // React must be resolved from the host app, not bundled or left as
+    // bare specifier (browsers can't resolve "react" without an import map).
+    // Solution: use an esbuild plugin that replaces react imports with
+    // references to window.React (which the host app exposes).
+    const reactGlobalPlugin = {
+      name: 'react-global',
+      setup(build) {
+        // Intercept all react-related imports
+        build.onResolve({ filter: /^react(-dom)?(\/.*)?$/ }, (args) => ({
+          path: args.path,
+          namespace: 'react-global',
+        }));
+        // Return a module that re-exports from window.React
+        build.onLoad({ filter: /.*/, namespace: 'react-global' }, (args) => {
+          if (args.path === 'react' || args.path === 'react/jsx-runtime') {
+            return {
+              contents: `
+                const React = window.__MIXI_REACT__;
+                export default React;
+                export const { useState, useEffect, useRef, useCallback, useMemo, useContext, createContext, Fragment, Suspense, lazy, forwardRef, memo, createElement } = React;
+                export const jsx = React.createElement;
+                export const jsxs = React.createElement;
+                export const jsxDEV = React.createElement;
+              `,
+              loader: 'js',
+            };
+          }
+          if (args.path === 'react-dom') {
+            return {
+              contents: `export default window.__MIXI_REACT_DOM__;`,
+              loader: 'js',
+            };
+          }
+          return { contents: 'export default {}', loader: 'js' };
+        });
+      },
+    };
+
     await build({
       entryPoints: [entryPoint],
       bundle: true,
@@ -68,7 +106,7 @@ for (const dir of deckDirs) {
       platform: 'browser',
       target: 'es2022',
       jsx: 'automatic',
-      external: ['react', 'react-dom', 'react/jsx-runtime'],
+      plugins: [reactGlobalPlugin],
       minify: true,
       sourcemap: false,
       treeShaking: true,
