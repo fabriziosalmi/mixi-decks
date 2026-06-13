@@ -121,7 +121,14 @@ export class TurboGenomeEngine {
   get isActive() { return this._isActive; }
   
   get sequenceStr() { return this._sequenceStr; }
-  set sequenceStr(v: string) { this._sequenceStr = v; this.currentIndex = 0; }
+  set sequenceStr(v: string) {
+    const invalidChars = [...v].filter(c => !['A', 'C', 'G', 'T'].includes(c));
+    if (invalidChars.length > 0) {
+      throw new Error(`Invalid nucleotide characters in sequence: ${[...new Set(invalidChars)].join(', ')}`);
+    }
+    this._sequenceStr = v;
+    this.currentIndex = 0;
+  }
 
   get speedMs() { return this._speedMs; }
   set speedMs(v: number) { this._speedMs = v; }
