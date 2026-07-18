@@ -2,7 +2,7 @@
 
 ![License](https://img.shields.io/badge/license-MIT-blue)
 ![Architecture](https://img.shields.io/badge/architecture-Rust/WASM+WebAudio-orange)
-![Version](https://img.shields.io/badge/version-v0.3.0-brightgreen)
+![Version](https://img.shields.io/badge/version-v0.4.0-brightgreen)
 ![Zero Dependencies](https://img.shields.io/badge/dependencies-Zero-brightgreen)
 
 Mixi Decks is a strictly typed library of high-performance drop-in plugins for the Mixi web-based DJ platform. These decks function as standalone modular instruments, generative synthesizers, and esoteric data audiolizers designed to perfectly integrate within the Mixi master mixer and transport architecture.
