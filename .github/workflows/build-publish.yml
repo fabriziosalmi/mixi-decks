@@ -46,6 +46,25 @@ jobs:
           if [ -d docs/.vitepress/dist ]; then
             cp -r docs/.vitepress/dist _site/docs/
           fi
+          # The root of the artifact holds ESM modules, not pages, so
+          # /mixi-decks/ answered 404 to anyone who opened it. Send them to the
+          # docs instead of leaving a dead URL. Written here rather than
+          # committed because dist/ is rebuilt on every run.
+          cat > _site/index.html <<'HTML'
+          <!doctype html>
+          <html lang="en">
+          <head>
+          <meta charset="utf-8">
+          <meta name="viewport" content="width=device-width, initial-scale=1">
+          <title>Mixi Decks</title>
+          <link rel="canonical" href="https://fabriziosalmi.github.io/mixi-decks/docs/">
+          <meta http-equiv="refresh" content="0; url=docs/">
+          </head>
+          <body>
+          <p>Mixi Decks documentation is at <a href="docs/">/mixi-decks/docs/</a>.</p>
+          </body>
+          </html>
+          HTML
           echo "=== Site contents ==="
           find _site -name "*.mjs" -o -name "*.json" | head -30
 
