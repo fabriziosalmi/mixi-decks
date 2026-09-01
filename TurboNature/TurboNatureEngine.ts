@@ -193,7 +193,7 @@ export class TurboNatureEngine {
     this.stop();
     if (this.oscInterval) clearInterval(this.oscInterval);
     if (this.noiseSource) {
-        try { this.noiseSource.stop(); } catch(e){}
+        try { this.noiseSource.stop(); } catch(e) { /* never started */ }
     }
   }
 }
