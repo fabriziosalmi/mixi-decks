@@ -193,7 +193,16 @@ export class TurboNatureEngine {
     this.stop();
     if (this.oscInterval) clearInterval(this.oscInterval);
     if (this.noiseSource) {
-        try { this.noiseSource.stop(); } catch(e){}
+        try {
+            this.noiseSource.stop();
+        } catch (e) {
+            // stop() throws InvalidStateError when the node was never started,
+            // which destroy() has no way to know. Anything else is a surprise,
+            // and destroy() should not turn it into a thrown teardown.
+            if ((e as DOMException)?.name !== 'InvalidStateError') {
+                console.warn('[TurboNature] noiseSource.stop() failed', e);
+            }
+        }
     }
   }
 }
