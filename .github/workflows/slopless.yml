@@ -27,7 +27,7 @@ jobs:
       - name: Run slopless
         id: slopless
         continue-on-error: true
-        uses: fabriziosalmi/slopless@e1b460bba5fed861bd121d9402694719f7ab776c # v1.1.3
+        uses: fabriziosalmi/slopless@a9177f6333d731ec620d786638cf26639708b606 # v1.2.2
         with:
           patterns: "**/*.ts **/*.tsx **/*.md"
           # This project has a tsconfig, so the type checker can resolve real
