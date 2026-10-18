@@ -78,8 +78,11 @@ export class TurboWeatherEngine {
 
     this.noiseNode.start();
     
-    // Auto fetch
-    this.fetchWeather();
+    // Auto fetch. Deliberately not awaited: start() is synchronous, and
+    // fetchWeather catches everything it can throw, reporting through
+    // onWeatherUpdate rather than rejecting. `void` says that on purpose,
+    // so a real dropped promise here would still stand out.
+    void this.fetchWeather();
   }
 
   async fetchWeather() {
